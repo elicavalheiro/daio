@@ -1,0 +1,8 @@
+{
+  "name": "daio",
+  "version": "1.0.0",
+  "description": "a simple vue clone",
+  "main": "index.js",
+  "author": "elicavalheiro <elimara.ac@gmail.com>",
+  "license": "MIT"
+}

@@ -1,0 +1,107 @@
+<div id="app"></div>
+
+<script>
+  // Create virtual node
+  const h = (tag, props, children) => {
+    // return the virtual node
+    return { tag, props, children };
+  };
+
+  // Mount a virtual node to the DOM
+  const mount = (vnode, container) => {
+    /**
+     * Creates an element based on the tag
+     * Set props
+     * Handle children
+     * Mount to the DOM
+     */
+
+    //  Creates an element based on the tag
+    vnode.el = document.createElement(vnode.tag);
+    const el = vnode.el;
+
+    // Set props
+    for (const key in vnode.props) {
+      el.setAttribute(key, vnode.props[key]);
+    }
+
+    // Handle children
+    if (typeof vnode.children === "string") {
+      el.textContent = vnode.children;
+    } else {
+      // Recursively mounts every children
+      vnode.children.forEach((child) => mount(child, el));
+    }
+
+    // Mount to the DOM
+    container.appendChild(el);
+  };
+
+  const unmount = (vnode) => {
+    /**
+     * Unmount the virtual node
+     */
+
+    vnode.el.parentNode.removeChild(vnode.el);
+  };
+
+  const patch = (node1, node2) => {
+    /**
+     * Case where the nodes are of the same tag
+     * Case where the new vnode has string children
+     * Case where the new vnode has an array of vnodes
+     * Case where the nodes are of different tags
+     */
+
+    const el = (node2.el = node1.el);
+
+    // If the tags are different replace the entire element
+    if (node1.tag !== node2.tag) {
+      // Replace node
+      mount(node2, el.parentNode);
+      // Unmount first node
+      unmount(node1);
+    } else {
+      if (typeof node2.children === "string") {
+        el.textContent = node2.children;
+      } else {
+        const children1 = node1.children;
+        const children2 = node2.children;
+        // Gets the length of the children
+        const commonLength = Math.min(children1.length, children2.length);
+
+        // Loops and patches the children
+        for (let i = 0; i < commonLength; i++) {
+          patch(children1[i], children2[i]);
+        }
+
+        if (children1.length > children2.length) {
+          // Removes the extra children
+          children1.slice(children2.length).forEach((child) => unmount(child));
+        } else if (children2.length > children1.length) {
+          // Adds the extra children
+          children2
+            .slice(children1.length)
+            .forEach((child) => mount(child, el));
+        }
+      }
+    }
+  };
+
+  const render = (message) => {
+    // Render a virtual node with a given message
+  };
+
+  const node1 = h("div", { class: "container" }, [
+    h("h1", { class: "title" }, "Hello World!"),
+    h(
+      "p",
+      { class: "content" },
+      "This is a simple example of a virtual node aaaaa."
+    ),
+  ]);
+
+  mount(node1, document.getElementById("app"));
+
+  // Create virtual nodes & render them below this line...
+</script>
